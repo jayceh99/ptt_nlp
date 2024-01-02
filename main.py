@@ -17,7 +17,7 @@ class c_ptt_requests:
         index_url_number = str(index_url_number[1]['href'])
         index_url_number = index_url_number.replace('/bbs/Gossiping/index' , '').replace('.html' , '')
         index_url_number = int(index_url_number) + 1
-        for i in range (0,10):
+        for i in range (0,20):
             url_tmp = index_url_number - i
             self.index_url.append('https://www.ptt.cc/bbs/Gossiping/index'+str(url_tmp)+'.html')
 
@@ -32,7 +32,6 @@ class c_ptt_requests:
                     self.all_url.append('https://www.ptt.cc'+i.find('a' , href = True)['href'])
             except :
                 pass
-        print(self.all_url)
 
 
     def f_get_all_context(self) :
@@ -63,20 +62,23 @@ class c_ptt_requests:
                         txt = str(i.find('span' , class_='f3 push-content').get_text().replace(':','').replace(' ',''))
                         push_words.append(txt)
 
-            for i in push_words:
-                s1_list = jieba.cut(i, cut_all =True)
-                for n  in s1_list :
+        for i in push_words:
+            s1_list = jieba.cut(i, cut_all =True)
+            for n  in s1_list :
+                if len(n) > 1 :
                     if n in push_word_count:
                         push_word_count[n] +=1
                     else:
                         push_word_count[n] = 1
-            for i in shhh_words:
-                s1_list = jieba.cut(i, cut_all =True)
-                for n  in s1_list :
+        for i in shhh_words:
+            s1_list = jieba.cut(i, cut_all =True)
+            for n  in s1_list :
+                if len(n) > 1 :
                     if n in shhh_word_count:
                         shhh_word_count[n] +=1
                     else:
                         shhh_word_count[n] = 1
+                    
         print(sorted(push_word_count.items(), key=lambda x:x[1]))
         print(sorted(shhh_word_count.items(), key=lambda x:x[1]))
         print(count)
