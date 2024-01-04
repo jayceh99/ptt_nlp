@@ -123,7 +123,7 @@ class c_ckiptagger_ptt:
         print(sorted(shhh_word_count.items(), key=lambda x:x[1]))
 
 def main():
-
+    #data_utils.download_data_gdown("./") 第一次運行才需要
     ptt_requests_q = c_ptt_requests()
     ptt_requests_q.f_find_index_url()
     ptt_requests_q.f_get_all_url()
