@@ -1,4 +1,4 @@
-# jieba need
+# jieba_ptt need
 >model
 > pip install git+https://github.com/APCLab/jieba-tw.git
 >
