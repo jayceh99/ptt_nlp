@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 class c_ptt_requests:
     def __init__(self) -> None:
         self.url = 'https://www.ptt.cc/bbs/Gossiping/index.html'
+        #self.url = 'https://www.ptt.cc/bbs/HatePolitics/index.html'
         self.my_headers = {'cookie' : 'over18=1;'}
         self.all_url = []
         self.index_url = []
@@ -16,10 +17,12 @@ class c_ptt_requests:
         index_url_number  = url.find_all('a' , href = True)
         index_url_number = str(index_url_number[1]['href'])
         index_url_number = index_url_number.replace('/bbs/Gossiping/index' , '').replace('.html' , '')
+        #index_url_number = index_url_number.replace('/bbs/HatePolitics/index' , '').replace('.html' , '')
         index_url_number = int(index_url_number) + 1
         for i in range (0,20):
             url_tmp = index_url_number - i
             self.index_url.append('https://www.ptt.cc/bbs/Gossiping/index'+str(url_tmp)+'.html')
+            #self.index_url.append('https://www.ptt.cc/bbs/HatePolitics/index'+str(url_tmp)+'.html')
 
     def f_get_all_url(self) :
         for k in self.index_url :
@@ -39,26 +42,26 @@ class c_ptt_requests:
         shhh_words = []
         push_words = []
         
-        for i in self.all_url:
-            r = requests.get(i , headers = self.my_headers)
+        for k in self.all_url:
+            r = requests.get(k , headers = self.my_headers)
             soup = BeautifulSoup(r.text, "html5lib")
             reser = soup.select('.push')
-            
             count += 1
             for i in reser:
-
                 try:
                     if '噓' in str(i.find('span' , class_='f1 hl push-tag').get_text()) :
                         shhh += 1
                         txt = str(i.find('span' , class_='f3 push-content').get_text().replace(':','').replace(' ',''))
                         shhh_words.append(txt)
-
                 except:
                     if '推' in str(i.find('span' , class_='hl push-tag').get_text()) :
                         push += 1
                         txt = str(i.find('span' , class_='f3 push-content').get_text().replace(':','').replace(' ',''))
                         push_words.append(txt)
+                
         print(count)
+        print(shhh)
+        print(push)
         return shhh_words , push_words
         
 class c_ptt_nlp:
@@ -73,7 +76,7 @@ class c_ptt_nlp:
         for i in self.push_words:
             s1_list = jieba.cut(i, cut_all =True)
             for n  in s1_list :
-                if len(n) > 1 :
+                if len(n) > 0 :
                     if n in push_word_count:
                         push_word_count[n] +=1
                     else:
@@ -81,7 +84,7 @@ class c_ptt_nlp:
         for i in self.shhh_words:
             s1_list = jieba.cut(i, cut_all =True)
             for n  in s1_list :
-                if len(n) > 1 :
+                if len(n) > 0 :
                     if n in shhh_word_count:
                         shhh_word_count[n] +=1
                     else:
