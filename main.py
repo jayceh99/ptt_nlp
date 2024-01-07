@@ -19,7 +19,7 @@ class c_ptt_requests:
         index_url_number = index_url_number.replace('/bbs/Gossiping/index' , '').replace('.html' , '')
         #index_url_number = index_url_number.replace('/bbs/HatePolitics/index' , '').replace('.html' , '')
         index_url_number = int(index_url_number) + 1
-        for i in range (0,20):
+        for i in range (0,40):
             url_tmp = index_url_number - i
             self.index_url.append('https://www.ptt.cc/bbs/Gossiping/index'+str(url_tmp)+'.html')
             #self.index_url.append('https://www.ptt.cc/bbs/HatePolitics/index'+str(url_tmp)+'.html')
@@ -41,23 +41,28 @@ class c_ptt_requests:
         push = 0
         shhh_words = []
         push_words = []
-        
+
         for k in self.all_url:
             r = requests.get(k , headers = self.my_headers)
             soup = BeautifulSoup(r.text, "html5lib")
             reser = soup.select('.push')
             count += 1
             for i in reser:
-                try:
-                    if '噓' in str(i.find('span' , class_='f1 hl push-tag').get_text()) :
-                        shhh += 1
-                        txt = str(i.find('span' , class_='f3 push-content').get_text().replace(':','').replace(' ',''))
-                        shhh_words.append(txt)
-                except:
-                    if '推' in str(i.find('span' , class_='hl push-tag').get_text()) :
-                        push += 1
-                        txt = str(i.find('span' , class_='f3 push-content').get_text().replace(':','').replace(' ',''))
-                        push_words.append(txt)
+
+                if '檔案過大！部分文章無法顯示' in i:
+                    continue
+                else:
+
+                    try:
+                        if '噓' in str(i.find('span' , class_='f1 hl push-tag').get_text()) :
+                            shhh += 1
+                            txt = str(i.find('span' , class_='f3 push-content').get_text().replace(':','').replace(' ',''))
+                            shhh_words.append(txt)
+                    except:
+                        if '推' in str(i.find('span' , class_='hl push-tag').get_text()) :
+                            push += 1
+                            txt = str(i.find('span' , class_='f3 push-content').get_text().replace(':','').replace(' ',''))
+                            push_words.append(txt)
                 
         print(count)
         print(shhh)
