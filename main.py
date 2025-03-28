@@ -1,5 +1,6 @@
 import requests
 import jieba
+import jieba.posseg as pseg
 from bs4 import BeautifulSoup
 
 class c_ptt_requests:
@@ -19,7 +20,7 @@ class c_ptt_requests:
         index_url_number = index_url_number.replace('/bbs/Gossiping/index' , '').replace('.html' , '')
         #index_url_number = index_url_number.replace('/bbs/HatePolitics/index' , '').replace('.html' , '')
         index_url_number = int(index_url_number) + 1
-        for i in range (0,40):
+        for i in range (0,20):
             url_tmp = index_url_number - i
             self.index_url.append('https://www.ptt.cc/bbs/Gossiping/index'+str(url_tmp)+'.html')
             #self.index_url.append('https://www.ptt.cc/bbs/HatePolitics/index'+str(url_tmp)+'.html')
@@ -31,7 +32,10 @@ class c_ptt_requests:
                 soup = BeautifulSoup(r.text , 'html5lib') 
                 url = soup.select('.title')
                 for i in url:
-                    self.all_url.append('https://www.ptt.cc'+i.find('a' , href = True)['href'])
+                    a_tag = i.find('a', href=True)
+                    if a_tag:
+                        self.all_url.append('https://www.ptt.cc' + a_tag['href'])
+
             except :
                 pass
 
@@ -43,10 +47,13 @@ class c_ptt_requests:
         push_words = []
 
         for k in self.all_url:
-            r = requests.get(k , headers = self.my_headers)
-            soup = BeautifulSoup(r.text, "html5lib")
-            reser = soup.select('.push')
-            count += 1
+            try:
+                r = requests.get(k , headers = self.my_headers)
+                soup = BeautifulSoup(r.text, "html5lib")
+                reser = soup.select('.push')
+                count += 1
+            except requests.exceptions.RequestException:
+                continue
             for i in reser:
 
                 if '檔案過大！部分文章無法顯示' in i:
@@ -79,21 +86,21 @@ class c_ptt_nlp:
         del_push = []
         del_shhh= []
         for i in self.push_words:
-            s1_list = jieba.cut(i, cut_all =True)
-            for n  in s1_list :
-                if len(n) > 0 :
-                    if n in push_word_count:
-                        push_word_count[n] +=1
+            words = pseg.cut(i)  
+            for word, flag in words:
+                if flag.startswith('n') and len(word) > 1:
+                    if word in push_word_count:
+                        push_word_count[word] += 1
                     else:
-                        push_word_count[n] = 1
+                        push_word_count[word] = 1
         for i in self.shhh_words:
-            s1_list = jieba.cut(i, cut_all =True)
-            for n  in s1_list :
-                if len(n) > 0 :
-                    if n in shhh_word_count:
-                        shhh_word_count[n] +=1
+            words = pseg.cut(i)
+            for word, flag in words:
+                if flag.startswith('n') and len(word) > 1:
+                    if word in shhh_word_count:
+                        shhh_word_count[word] +=1
                     else:
-                        shhh_word_count[n] = 1
+                        shhh_word_count[word] = 1
 
         for i in push_word_count :
             if push_word_count[i] < 10 :
